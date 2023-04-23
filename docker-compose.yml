@@ -66,20 +66,62 @@ services:
         timeout: 10s
 
     ecu1:
-      image: horsemens/horsemens-pahoclient:development
+      image: horsemens/horsemens-pahoclient:ecu1
       env_file:
         - env/ecu1.env
       depends_on:
         subscriber:
           condition: service_healthy
     
-    ecu2:
-      image: horsemens/horsemens-pahoclient:development
+    # ecu2:
+    #   image: horsemens/horsemens-pahoclient:ecu2
+    #   env_file:
+    #     - env/ecu2.env
+    #   depends_on:
+    #     subscriber:
+    #       condition: service_healthy
+    
+    # ecu3:
+    #   image: horsemens/horsemens-pahoclient:ecu3
+    #   env_file:
+    #     - env/ecu3.env
+    #   depends_on:
+    #     subscriber:
+    #       condition: service_healthy
+
+    # ecu4:
+    #   image: horsemens/horsemens-pahoclient:ecu4
+    #   env_file:
+    #     - env/ecu4.env
+    #   depends_on:
+    #     subscriber:
+    #       condition: service_healthy
+    
+    ecu5:
+      image: horsemens/horsemens-pahoclient:ecu5
       env_file:
-        - env/ecu2.env
+        - env/ecu5.env
       depends_on:
         subscriber:
           condition: service_healthy
+    
+    # ecu6:
+    #   image: horsemens/horsemens-pahoclient:ecu6
+    #   env_file:
+    #     - env/ecu6.env
+    #   depends_on:
+    #     subscriber:
+    #       condition: service_healthy
+
+    # ecu7:
+    #   image: horsemens/horsemens-pahoclient:ecu7
+    #   env_file:
+    #     - env/ecu7.env
+    #   depends_on:
+    #     subscriber:
+    #       condition: service_healthy
+
+
 
            
 
