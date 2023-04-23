@@ -1,0 +1,87 @@
+version: '2.10.2'
+
+services:
+    django:
+      image: horsemens/django:1.0.0
+      ports:
+        - 8000:8010
+      depends_on:
+        mssql-init:
+          condition: service_completed_successfully
+      healthcheck:
+        test: curl http://localhost:8010 || exit 1
+        interval: 30s
+        retries: 5
+        start_period: 60s
+        timeout: 10s
+
+    mssql:
+      image: mcr.microsoft.com/mssql/server
+      ports:
+        - 1433:1433
+      volumes:
+        - sqldata:/var/opt/mssql 
+      environment:
+        ACCEPT_EULA: Y
+        MSSQL_SA_PASSWORD: "root@123"
+      healthcheck:
+        test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P root@123 || exit 1
+        interval: 10s
+        retries: 5
+        start_period: 60s
+        timeout: 10s
+    
+    mssql-init:
+      image: horsemens/mssql-init:1.0.0
+      depends_on:
+        mssql:
+          condition: service_healthy
+    
+    mssql-sensoradd:
+      image: horsemens/mssql-sensoradd:1.0.0
+      depends_on:
+        django:
+          condition: service_healthy
+    
+    mosquitto:
+      image: eclipse-mosquitto:latest
+      ports:
+        - 8083:8083
+      volumes:
+        - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+
+    subscriber:
+      image: horsemens/horsemens-pahoclient:development
+      env_file:
+        - env/listner.env
+      depends_on:
+        mssql-sensoradd:
+          condition: service_completed_successfully
+      healthcheck:
+        test: exit 0
+        interval: 10s
+        retries: 5
+        start_period: 60s
+        timeout: 10s
+
+    ecu1:
+      image: horsemens/horsemens-pahoclient:development
+      env_file:
+        - env/ecu1.env
+      depends_on:
+        subscriber:
+          condition: service_healthy
+    
+    ecu2:
+      image: horsemens/horsemens-pahoclient:development
+      env_file:
+        - env/ecu2.env
+      depends_on:
+        subscriber:
+          condition: service_healthy
+
+           
+
+volumes:
+  sqldata:
